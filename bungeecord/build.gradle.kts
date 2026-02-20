@@ -24,7 +24,7 @@ dependencies {
     compileOnly("net.kyori:adventure-platform-bungeecord:4.4.1")
     implementation("com.alessiodp.libby:libby-bungee:2.0.0-SNAPSHOT")
     implementation("org.bstats:bstats-bungeecord:3.0.2")
-    compileOnly("net.md-5:bungeecord-api:1.16-R0.5-SNAPSHOT")
+    compileOnly("net.md-5:bungeecord-api:1.20-R0.2")
     compileOnly("me.lucko:spark-api:0.1-SNAPSHOT")
     compileOnly(fileTree("libs"))
 }

@@ -15,6 +15,14 @@ repositories {
     mavenCentral()
 }
 
+allprojects {
+    repositories {
+        maven("https://repo.alessiodp.com/releases/")
+        maven("https://repo.alessiodp.com/snapshots/")
+        maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+    }
+}
+
 dependencies {
     implementation(project(":common"))
     implementation(project(":velocity"))

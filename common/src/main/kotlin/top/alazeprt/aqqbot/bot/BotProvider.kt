@@ -39,15 +39,8 @@ object BotProvider {
     private fun connect(plugin: AQQBot, uri: URI, token: String?) {
         try {
             val client = if (token != null) WebsocketBotClient(uri, token) else WebsocketBotClient(uri)
-            // Enable heartbeat detection (timeout in seconds, 0 to disable)
-            // This relies on the underlying WebSocket implementation supporting setConnectionLostTimeout
-            try {
-                client.connectionLostTimeout = 30
-            } catch (e: Exception) {
-                // Ignore if method not found or not supported
-            }
             
-            client.connectBlocking() // Use blocking connect to ensure immediate status check
+            client.connect()
             botClient = client
             
             if (botClient?.eventList?.contains(aqbListener) == false) {
@@ -68,12 +61,12 @@ object BotProvider {
                 try {
                     Thread.sleep(5000) // Check every 5 seconds
                     
-                    if (botClient == null || !botClient!!.isOpen) {
+                    if (botClient == null || !botClient!!.isConnected) {
                         plugin.debugModule?.debugLogger?.log("Connection lost, attempting to reconnect...")
                         
                         // Clean up old client
                         try {
-                            botClient?.close()
+                            botClient?.disconnect()
                         } catch (e: Exception) {
                             // Ignore close errors
                         }
