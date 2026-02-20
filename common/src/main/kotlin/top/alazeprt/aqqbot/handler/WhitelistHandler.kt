@@ -121,13 +121,14 @@ class WhitelistHandler(val plugin: AQQBot) {
         config.getStringList("whitelist.prefix.bind", event.groupId).forEach {
             if (message.lowercase().startsWith(it.lowercase())) {
                 val playerName = message.split(" ")[1]
-                if (plugin.bindCooldownMap.containsKey(playerName)) {
+                val senderId = event.senderId.toString()
+                if (plugin.bindCooldownMap.containsKey(senderId)) {
                     BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
                         plugin.messageManager.get("qq.whitelist.in_cooldown",
-                            mutableMapOf("name" to playerName, "cooldown_time" to plugin.bindCooldownMap[playerName]!!.toString()), event.groupId)))
+                            mutableMapOf("name" to playerName, "cooldown_time" to plugin.bindCooldownMap[senderId]!!.toString()), event.groupId)))
                 } else {
-                    plugin.bindCooldownMap[playerName] = config.getLong("whitelist.cooldown.bind", event.groupId)
-                    bind(event.senderId.toString(), event.groupId, playerName)
+                    plugin.bindCooldownMap[senderId] = config.getLong("whitelist.cooldown.bind", event.groupId)
+                    bind(senderId, event.groupId, playerName)
                 }
                 return true
             }
@@ -135,13 +136,14 @@ class WhitelistHandler(val plugin: AQQBot) {
         config.getStringList("whitelist.prefix.unbind", event.groupId).forEach {
             if (message.lowercase().startsWith(it.lowercase())) {
                 val playerName = message.substring(it.length + 1)
-                if (plugin.unbindCooldownMap.containsKey(playerName)) {
+                val senderId = event.senderId.toString()
+                if (plugin.unbindCooldownMap.containsKey(senderId)) {
                     BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
                         plugin.messageManager.get("qq.whitelist.in_cooldown",
-                            mutableMapOf("name" to playerName, "cooldown_time" to plugin.unbindCooldownMap[playerName]!!.toString()), event.groupId)))
+                            mutableMapOf("name" to playerName, "cooldown_time" to plugin.unbindCooldownMap[senderId]!!.toString()), event.groupId)))
                 } else {
-                    plugin.unbindCooldownMap[playerName] = config.getLong("whitelist.cooldown.unbind", event.groupId)
-                    unbind(event.senderId.toString(), event.groupId, playerName)
+                    plugin.unbindCooldownMap[senderId] = config.getLong("whitelist.cooldown.unbind", event.groupId)
+                    unbind(senderId, event.groupId, playerName)
                 }
                 return true
             }
