@@ -117,37 +117,29 @@ class WhitelistHandler(val plugin: AQQBot) {
         if (!config.getBoolean("whitelist.enable", event.groupId)) {
             return false
         }
-        if (message.split(" ").size != 2) return false
-        config.getStringList("whitelist.prefix.bind", event.groupId).forEach {
-            if (message.lowercase().startsWith(it.lowercase())) {
-                val playerName = message.split(" ")[1]
-                val senderId = event.senderId.toString()
-                if (plugin.bindCooldownMap.containsKey(senderId)) {
-                    BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
-                        plugin.messageManager.get("qq.whitelist.in_cooldown",
-                            mutableMapOf("name" to playerName, "cooldown_time" to plugin.bindCooldownMap[senderId]!!.toString()), event.groupId)))
-                } else {
-                    plugin.bindCooldownMap[senderId] = config.getLong("whitelist.cooldown.bind", event.groupId)
-                    bind(senderId, event.groupId, playerName)
-                }
-                return true
-            }
+        
+        val parts = message.split("\\s+".toRegex()).filter { it.isNotEmpty() }
+        if (parts.size < 2) return false
+        
+        val senderId = event.senderId.toString()
+        val content = parts.subList(1, parts.size).joinToString(" ")
+
+        // Check Bind
+        config.getStringList("whitelist.prefix.bind", event.groupId).find {
+            parts[0].lowercase().startsWith(it.lowercase())
+        }?.let {
+            bind(senderId, event.groupId, content)
+            return true
         }
-        config.getStringList("whitelist.prefix.unbind", event.groupId).forEach {
-            if (message.lowercase().startsWith(it.lowercase())) {
-                val playerName = message.substring(it.length + 1)
-                val senderId = event.senderId.toString()
-                if (plugin.unbindCooldownMap.containsKey(senderId)) {
-                    BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
-                        plugin.messageManager.get("qq.whitelist.in_cooldown",
-                            mutableMapOf("name" to playerName, "cooldown_time" to plugin.unbindCooldownMap[senderId]!!.toString()), event.groupId)))
-                } else {
-                    plugin.unbindCooldownMap[senderId] = config.getLong("whitelist.cooldown.unbind", event.groupId)
-                    unbind(senderId, event.groupId, playerName)
-                }
-                return true
-            }
+
+        // Check Unbind
+        config.getStringList("whitelist.prefix.unbind", event.groupId).find {
+            parts[0].lowercase().startsWith(it.lowercase())
+        }?.let {
+            unbind(senderId, event.groupId, content)
+            return true
         }
+
         return false
     }
 }
