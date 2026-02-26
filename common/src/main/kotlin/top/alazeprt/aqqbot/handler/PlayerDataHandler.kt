@@ -162,8 +162,8 @@ class PlayerDataHandler(val plugin: AQQBot) {
 
     private fun createStatsImage(playerName: String, debrisCount: Int, diamondCount: Int, playtimeHours: String, 
                                  deaths: Int, mobKills: Int, playerKills: Int): String {
-        val width = 500
-        val height = 360
+        val width = 350
+        val height = 310
         val image = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
         val graphics = image.createGraphics()
 
@@ -191,17 +191,17 @@ class PlayerDataHandler(val plugin: AQQBot) {
 
         var y = 105
         val step = 35
-        graphics.drawString("⏳ 在线时长: $playtimeHours 小时", 40, y); y += step
-        graphics.drawString("💀 死亡次数: $deaths 次", 40, y); y += step
-        graphics.drawString("⚔️ 击杀生物: $mobKills 只", 40, y); y += step
-        graphics.drawString("🤺 击杀玩家: $playerKills 次", 40, y); y += step
-        graphics.drawString("💎 挖掘钻石矿: $diamondCount 个", 40, y); y += step
-        graphics.drawString("🔥 挖掘远古残骸: $debrisCount 个", 40, y); y += step
+        graphics.drawString("在线时长: $playtimeHours 小时", 40, y); y += step
+        graphics.drawString("死亡次数: $deaths 次", 40, y); y += step
+        graphics.drawString("击杀生物: $mobKills 只", 40, y); y += step
+        graphics.drawString("击杀玩家: $playerKills 次", 40, y); y += step
+        graphics.drawString("挖掘钻石矿: $diamondCount 个", 40, y); y += step
+        graphics.drawString("挖掘远古残骸: $debrisCount 个", 40, y); y += step
 
         graphics.color = Color(150, 150, 150)
         font = Font("Microsoft YaHei", Font.ITALIC, 14)
         try { graphics.font = font } catch (e: Exception) { graphics.font = Font(Font.SANS_SERIF, Font.ITALIC, 14) }
-        graphics.drawString("AQQBot 玩家数据统计系统", width - 200, height - 20)
+//        graphics.drawString("AQQBot 玩家数据统计系统", width - 200, height - 20)
 
         graphics.dispose()
 
