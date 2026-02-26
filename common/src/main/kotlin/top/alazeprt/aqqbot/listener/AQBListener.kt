@@ -69,6 +69,8 @@ class AQBListener(val plugin: AQQBot) : Listener {
                 plugin.debugModule?.debugLogger?.log("is handle whitelist?: $handleWl")
                 val handleWlAdmin = WhitelistAdminHandler(plugin).handle(message, event, memberList)
                 plugin.debugModule?.debugLogger?.log("is handle whitelist admin?: $handleWlAdmin")
+                val handlePlayerData = top.alazeprt.aqqbot.handler.PlayerDataHandler(plugin).handle(message, event)
+                plugin.debugModule?.debugLogger?.log("is handle player data?: $handlePlayerData")
                 val handleCommand = CommandHandler(plugin).handle(message, event, memberList)
                 plugin.debugModule?.debugLogger?.log("is handle command?: $handleCommand")
                 var handleCustom = false
