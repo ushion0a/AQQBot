@@ -337,6 +337,21 @@ player_data:
   command:
     - "/查询数据"
     - "查询数据"
+
+  # CMI 经济数据配置
+  cmi:
+    enable: false
+    # 数据存储类型: sqlite, mysql
+    type: "sqlite"
+    # MySQL 配置
+    host: "127.0.0.1"
+    port: 3306
+    user: "root"
+    password: "password"
+    database: "cmi"
+    table: "users"
+    # SQLite 配置文件绝对路径 (如: /home/minecraft/server/plugins/CMI/cmi.sqlite)
+    sqlite_file: ""
     
   # 子服的世界目录路径 (主要用于 Velocity/BungeeCord 代理端)
   # 插件将在此目录下的 stats 文件夹中读取玩家数据
