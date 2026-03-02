@@ -220,21 +220,37 @@ class PlayerDataHandler(val plugin: AQQBot) {
                 if (e.message?.contains("No suitable driver", ignoreCase = true) == true) {
                     // 仅在当前类加载器中找不到驱动时，才使用 Libby 下载并加载，以避免重复控制台输出
                     if (type == "mysql") {
-                        val mysqlLib = Library.builder()
-                            .groupId("com{}mysql")
-                            .artifactId("mysql-connector-j")
-                            .version("8.3.0")
-                            .resolveTransitiveDependencies(true)
-                            .build()
-                        plugin.libraryManager.loadLibrary(mysqlLib)
+                        if (!isMysqlLoaded) {
+                            val mysqlLib = Library.builder()
+                                .groupId("com{}mysql")
+                                .artifactId("mysql-connector-j")
+                                .version("8.3.0")
+                                .resolveTransitiveDependencies(true)
+                                .build()
+                            plugin.libraryManager.loadLibrary(mysqlLib)
+                            try {
+                                Class.forName("com.mysql.cj.jdbc.Driver", true, plugin.javaClass.classLoader)
+                            } catch (ex: ClassNotFoundException) {
+                                // 忽略
+                            }
+                            isMysqlLoaded = true
+                        }
                     } else {
-                        val sqliteLib = Library.builder()
-                            .groupId("org{}xerial")
-                            .artifactId("sqlite-jdbc")
-                            .version("3.45.1.0")
-                            .resolveTransitiveDependencies(true)
-                            .build()
-                        plugin.libraryManager.loadLibrary(sqliteLib)
+                        if (!isSqliteLoaded) {
+                            val sqliteLib = Library.builder()
+                                .groupId("org{}xerial")
+                                .artifactId("sqlite-jdbc")
+                                .version("3.49.0.0")
+                                .resolveTransitiveDependencies(true)
+                                .build()
+                            plugin.libraryManager.loadLibrary(sqliteLib)
+                            try {
+                                Class.forName("org.sqlite.JDBC", true, plugin.javaClass.classLoader)
+                            } catch (ex: ClassNotFoundException) {
+                                // 忽略
+                            }
+                            isSqliteLoaded = true
+                        }
                     }
                     // 加载后再试一次
                     if (type == "mysql" && user != null && pass != null) {
@@ -377,7 +393,7 @@ class PlayerDataHandler(val plugin: AQQBot) {
         // Fetch and Draw 3D Body Skin
         try {
             // 使用 playerName 获取身体，避免离线 UUID 导致史蒂夫
-            val skinUrl = URL("https://mc-heads.net/body/$playerName/180/left")
+            val skinUrl = URL("https://mc-api.io/render/full/$playerName/java?size=250")
             val connection = skinUrl.openConnection() as java.net.HttpURLConnection
             connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
             connection.connectTimeout = 5000
