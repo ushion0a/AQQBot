@@ -102,7 +102,7 @@ class PlayerDataHandler(val plugin: AQQBot) {
         plugin.submitAsync {
             try {
                 val imgBase64 = createStatsImage(playerName, uuid, debrisMined.coerceAtLeast(0), diamondMined, playtimeHours, 
-                    deaths.coerceAtLeast(0), mobKills.coerceAtLeast(0), playerKills.coerceAtLeast(0), balance, totalDistance)
+                    deaths.coerceAtLeast(0), mobKills.coerceAtLeast(0), playerKills.coerceAtLeast(0), balance, totalDistance, userId)
                 BotProvider.getBot()?.action(SendGroupMessage(event.groupId, "[CQ:image,file=base64://$imgBase64]", false))
             } catch (e: Exception) {
                 plugin.debugModule?.debugLogger?.log("Failed to create player data image: ${e.message}")
@@ -300,7 +300,7 @@ class PlayerDataHandler(val plugin: AQQBot) {
     }
 
     private fun createStatsImage(playerName: String, uuid: UUID, debrisCount: Int, diamondCount: Int, playtimeHours: String, 
-                                 deaths: Int, mobKills: Int, playerKills: Int, balance: Double, totalDistance: Int): String {
+                                 deaths: Int, mobKills: Int, playerKills: Int, balance: Double, totalDistance: Int, userId: Long): String {
         val cardW = 216
         val cardH = 90
         val gap = 16
@@ -339,7 +339,13 @@ class PlayerDataHandler(val plugin: AQQBot) {
         
         var fontBold = Font("Microsoft YaHei", Font.BOLD, 22)
         try { graphics.font = fontBold } catch (e: Exception) { graphics.font = Font(Font.SANS_SERIF, Font.BOLD, 22) }
-        graphics.drawString("玩家信息", 40, 55)
+        graphics.drawString("玩家信息 $userId", 40, 55)
+
+        // // QQ ID Text
+        // var fontSmall = Font("Microsoft YaHei", Font.BOLD, 22)
+        // try { graphics.font = fontSmall } catch (e: Exception) { graphics.font = Font(Font.SANS_SERIF, Font.PLAIN, 16) }
+        // graphics.color = titleTextColor
+        // graphics.drawString("QQ: $userId", 140, 53)
 
         // Data Cards
         val data = listOf(
