@@ -152,26 +152,44 @@ class PlayerDataHandler(val plugin: AQQBot) {
                     plugin.debugModule?.debugLogger?.log("Failed to parse usercache.json: ${e.message}")
                 }
 
-                val statsDir = File(dir, "stats")
-                if (statsDir.exists() && statsDir.isDirectory) {
-                    var statsFile = File(statsDir, "$targetUuid.json")
-                    if (!statsFile.exists() && targetUuid != uuid.toString()) {
-                        statsFile = File(statsDir, "$uuid.json")
+                // 兼容 26.1.2 起 Minecraft 将 stats 目录迁移至 <world>/players/stats/
+                // 按查找顺序: <world>/stats/ → <world>/players/stats/
+                val statsDirCandidates = listOf(
+                    File(dir, "stats"),
+                    File(dir, "players/stats")
+                )
+                var statsFile: File? = null
+                for (candidate in statsDirCandidates) {
+                    if (!candidate.exists() || !candidate.isDirectory) continue
+                    var f = File(candidate, "$targetUuid.json")
+                    if (!f.exists() && targetUuid != uuid.toString()) {
+                        f = File(candidate, "$uuid.json")
                     }
-                    if (statsFile.exists()) {
-                        val content = statsFile.readText()
-                        val json = JsonParser.parseString(content).asJsonObject
-                        if (json.has("stats")) {
-                            val stats = json.getAsJsonObject("stats")
-                            if (stats.has(category)) {
-                                val cat = stats.getAsJsonObject(category)
-                                if (cat.has(key)) {
-                                    return cat.get(key).asInt
-                                }
-                            }
+                    if (f.exists()) {
+                        statsFile = f
+                        break
+                    }
+                }
+                if (statsFile != null) {
+                    val content = statsFile.readText()
+                    val json = JsonParser.parseString(content).asJsonObject
+
+                    // 兼容新旧格式:
+                    // 旧版 (<=1.21.1): { "stats": { "minecraft:custom": { ... } } }
+                    // 新版 (>=1.21.2): { "minecraft:custom": { ... } }  (stats 包裹被移除)
+                    val stats = if (json.has("stats")) {
+                        json.getAsJsonObject("stats")
+                    } else {
+                        json
+                    }
+
+                    if (stats.has(category)) {
+                        val cat = stats.getAsJsonObject(category)
+                        if (cat.has(key)) {
+                            return cat.get(key).asInt
                         }
-                        return 0
                     }
+                    return 0
                 }
             }
         } catch (e: Exception) {
